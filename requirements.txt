@@ -1,3 +1,5 @@
 opencv-python
 deepface
 tf_keras
+mediapipe
+xarm-python-sdk
