@@ -1,10 +1,10 @@
+# Import Libraries
 import cv2
 import math
 import time
 import mediapipe as mp
 from deepface import DeepFace
 from xarm.wrapper import XArmAPI
-
 
 # Configure the xArm
 arm = XArmAPI('192.168.1.201')  # Use Robot's IP
@@ -31,7 +31,7 @@ def get_max_value_key(dictionary):
 
   Args:
     dictionary: A dictionary with integer values.
-
+x|
   Returns:
     The key associated with the highest integer value in the dictionary.
   """
@@ -48,6 +48,7 @@ def get_max_value_key(dictionary):
 
   return max_key
 
+emotions_counter_dict = {"happy" : 0, "sad" : 0, "angry" : 0, "neutral" : 0, "surprise" : 0}
 
 # Load face cascade classifier
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -71,8 +72,7 @@ color_tuple = (0, 255, 0)
 
 start_detection_time = time.perf_counter()
 
-emotions_counter_dict = {"happy" : 0, "sad" : 0, "angry" : 0, "neutral" : 0, "surprise" : 0}
-
+# Loop to capture frames
 while True:
 
     if stop_time + wait_seconds < time.perf_counter():
@@ -99,8 +99,6 @@ while True:
 
     # Detect faces in the frame
     faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
-
-    j = 0
 
     if k == 0:
 
@@ -138,7 +136,8 @@ while True:
               arm.angle_speed = 200
               arm.set_servo_angle(angle=[-7.0, -35.1, -7.3, -4.9, 40.1, -1.7], speed=arm.angle_speed, mvacc=arm.angle_acc, wait=False, radius=0.0)
               arm.set_position(*[246.6, -30.6, 198.9, 176.6, -2.2, -1.5], speed=arm.tcp_speed, mvacc=arm.tcp_acc, radius=-1.0, wait=True)
-              arm.move_circle([271.6, -5.6, 198.9, 176.6, -2.2, -1.5], [271.6, -55.6, 198.9, 176.6, -2.2, -1.5], float(180) / 360 * 100, speed=arm.tcp_speed, mvacc=arm.tcp_acc, wait=True)
+              arm.move_circle([271.6, -5.6, 198.9, 176.6, -2.2, -1.5],
+                               [271.6, -55.6, 198.9, 176.6, -2.2, -1.5], float(180) / 360 * 100, speed=arm.tcp_speed, mvacc=arm.tcp_acc, wait=True)
               arm.set_servo_angle(angle=[-7.0, -35.1, -7.3, -4.9, 40.1, -1.7], speed=arm.angle_speed, mvacc=arm.angle_acc, wait=False, radius=0.0)
 
             if max_emotion_key == 'sad':
@@ -148,7 +147,8 @@ while True:
               arm.angle_speed = 200
               arm.set_servo_angle(angle=[-7.0, -35.1, -7.3, -4.9, 40.1, -1.7], speed=arm.angle_speed, mvacc=arm.angle_acc, wait=False, radius=0.0)
               arm.set_position(*[246.6, -30.6, 198.9, 176.6, -2.2, -1.5], speed=arm.tcp_speed, mvacc=arm.tcp_acc, radius=-1.0, wait=True)
-              arm.move_circle([271.6, -55.6, 198.9, 176.6, -2.2, -1.5], [271.6, -5.6, 198.9, 176.6, -2.2, -1.5], float(180) / 360 * 100, speed=arm.tcp_speed, mvacc=arm.tcp_acc, wait=True)
+              arm.move_circle([271.6, -55.6, 198.9, 176.6, -2.2, -1.5], 
+                              [271.6, -5.6, 198.9, 176.6, -2.2, -1.5], float(180) / 360 * 100, speed=arm.tcp_speed, mvacc=arm.tcp_acc, wait=True)
               arm.set_servo_angle(angle=[-7.0, -35.1, -7.3, -4.9, 40.1, -1.7], speed=arm.angle_speed, mvacc=arm.angle_acc, wait=False, radius=0.0)
 
             if max_emotion_key == 'neutral':
@@ -168,13 +168,12 @@ while True:
                 arm.angle_speed = 200
                 arm.set_servo_angle(angle=[-7.0, -35.1, -7.3, -4.9, 40.1, -1.7], speed=arm.angle_speed, mvacc=arm.angle_acc, wait=False, radius=0.0)
                 arm.set_position(*[246.6, -30.6, 198.9, 176.6, -2.2, -1.5], speed=arm.tcp_speed, mvacc=arm.tcp_acc, radius=-1.0, wait=True)
-                arm.move_circle([271.6, -55.6, 198.9, 176.6, -2.2, -1.5], [271.6, -5.6, 198.9, 176.6, -2.2, -1.5], float(360) / 360 * 100, speed=arm.tcp_speed, mvacc=arm.tcp_acc, wait=True)
+                arm.move_circle([271.6, -55.6, 198.9, 176.6, -2.2, -1.5], 
+                                [271.6, -5.6, 198.9, 176.6, -2.2, -1.5], float(360) / 360 * 100, speed=arm.tcp_speed, mvacc=arm.tcp_acc, wait=True)
                 arm.set_servo_angle(angle=[-7.0, -35.1, -7.3, -4.9, 40.1, -1.7], speed=arm.angle_speed, mvacc=arm.angle_acc, wait=False, radius=0.0)
 
-
-
+            # Pause detection
             k = 1
-            # i = 0
             stop_time = time.perf_counter()
             text = "Detection Paused"
             color_tuple = (0, 0, 255)
@@ -192,3 +191,4 @@ while True:
 # Release the capture and close all windows
 cap.release()
 cv2.destroyAllWindows()
+
